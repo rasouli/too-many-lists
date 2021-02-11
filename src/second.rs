@@ -9,9 +9,6 @@ struct Node<T> {
     next: Link<T>,
 }
 
-pub struct IntoIter<T>(List<T>);
-
-
 impl<T> List<T> {
     pub fn new() -> Self {
         List { head: None }
@@ -57,9 +54,10 @@ impl<T> List<T> {
     }
 }
 
-impl <T> List<T> {
-    pub fn into_iter(self) -> IntoIter<T> {
-        self.pop();
+pub struct IntoIter<T>(List<T>);
+
+impl<T> List<T> {
+    pub fn into_iter(mut self) -> IntoIter<T> {
         IntoIter(self)
     }
 }
@@ -69,6 +67,27 @@ impl<T> Iterator for IntoIter<T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.0.pop()
+    }
+}
+
+pub struct Iter<T> {
+    next: Option<&Node<T>>,
+}
+
+impl<T> List<T> {
+    pub fn iter(&self) -> Iter<T> {
+       Iter {next: self.head.map(|node| &node)}
+    }
+}
+
+impl<T> Iterator for Iter<T> {
+    type Item = &T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.map(|node| {
+            self.next = node.next.map(|node| &node);
+            &node.elem
+        })
     }
 }
 
