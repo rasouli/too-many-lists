@@ -1,5 +1,3 @@
-use std::mem;
-
 pub struct List {
     head: Link,
 }
@@ -19,7 +17,8 @@ impl List {
     pub fn push(&mut self, value: i32) {
         let new_node = Box::new(Node {
             elem: value,
-            next: mem::replace(&mut self.head, None),
+            // next: mem::replace(&mut self.head, None),
+            next: self.head.take(),
         });
 
         self.head = Some(new_node);
@@ -29,7 +28,7 @@ impl List {
 
         // let old_head = mem::replace(&mut self.head, Link::Empty);
         // match old_head {
-        match mem::replace(&mut self.head, None) {
+        match self.head.take() {
             None => None,
             Some(node) => {
                 self.head = node.next;
@@ -41,10 +40,11 @@ impl List {
 
 impl Drop for List {
     fn drop(&mut self) {
-        let mut cur_link = mem::replace(&mut self.head, None);
+        let mut cur_link = self.head.take();
 
         while let Some(mut boxed_node) = cur_link {
-            cur_link = mem::replace(&mut boxed_node.next, None);
+            // cur_link = mem::replace(&mut boxed_node.next, None);
+            cur_link = boxed_node.next.take();
         }
     }
 }
