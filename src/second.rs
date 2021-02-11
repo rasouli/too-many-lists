@@ -59,6 +59,7 @@ impl<T> List<T> {
 
 impl <T> List<T> {
     pub fn into_iter(self) -> IntoIter<T> {
+        self.pop();
         IntoIter(self)
     }
 }
