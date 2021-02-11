@@ -28,13 +28,19 @@ impl List {
 
         // let old_head = mem::replace(&mut self.head, Link::Empty);
         // match old_head {
-        match self.head.take() {
-            None => None,
-            Some(node) => {
-                self.head = node.next;
-                Some(node.elem)
-            }
-        }
+        // match self.head.take() {
+        //     None => None,
+        //     Some(node) => {
+        //         self.head = node.next;
+        //         Some(node.elem)
+        //     }
+        // }
+        self.head.take().map(|node| {
+            self.head = node.next;
+            node.elem
+        })
+
+
     }
 }
 
