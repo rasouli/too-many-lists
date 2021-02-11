@@ -86,7 +86,7 @@ pub struct Iter<'a, T> {
 }
 
 impl<T> List<T> {
-    pub fn iter(&'_ self) -> Iter<'_, T> {
+    pub fn iter(&self) -> Iter<'_, T> {
         // Iter { next: self.head.as_ref().map(|node: &Box<Node<T>>| node.as_ref()) }
         // or
         // Iter { next: self.head.as_ref().map(|node| &**node) }
