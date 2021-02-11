@@ -1,20 +1,20 @@
-pub struct List {
-    head: Link,
+pub struct List<T> {
+    head: Link<T>,
 }
 
-type Link = Option<Box<Node>>;
+type Link<T> = Option<Box<Node<T>>>;
 
-struct Node {
-    elem: i32,
-    next: Link,
+struct Node<T> {
+    elem: T,
+    next: Link<T>,
 }
 
-impl List {
+impl<T> List<T> {
     pub fn new() -> Self {
         List { head: None }
     }
 
-    pub fn push(&mut self, value: i32) {
+    pub fn push(&mut self, value: T) {
         let new_node = Box::new(Node {
             elem: value,
             // next: mem::replace(&mut self.head, None),
@@ -24,7 +24,7 @@ impl List {
         self.head = Some(new_node);
     }
 
-    pub fn pop(&mut self) -> Option<i32> {
+    pub fn pop(&mut self) -> Option<T> {
 
         // let old_head = mem::replace(&mut self.head, Link::Empty);
         // match old_head {
@@ -39,12 +39,10 @@ impl List {
             self.head = node.next;
             node.elem
         })
-
-
     }
 }
 
-impl Drop for List {
+impl<T> Drop for List<T> {
     fn drop(&mut self) {
         let mut cur_link = self.head.take();
 
@@ -83,6 +81,5 @@ mod test {
 
         assert_eq!(list.pop(), Some(1));
         assert_eq!(list.pop(), None);
-
     }
 }
