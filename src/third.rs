@@ -1,5 +1,4 @@
 use std::rc::Rc;
-use std::ops::Deref;
 
 pub struct List<T> {
     head: Link<T>,
