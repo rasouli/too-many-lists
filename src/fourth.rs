@@ -51,6 +51,57 @@ impl <T> List<T> {
         }
     }
 
+    pub fn pop_front(&mut self) -> Option<T> {
+        self.head.take().map(|old_head| {
+            let next_node = old_head.borrow_mut().next.take();
+            match next_node {
+                Some(new_head) => {
+                    new_head.borrow_mut().prev.take();
+                    self.head = Some(new_head);
+                }
+                None => {
+                    self.tail.take();
+                }
+            }
 
+            // old_head.borrow_mut().elem -> Error: moving out of borrowed content (borrow_mut returns &mut which our elem:T is the thing we are trying to move out)
+            // old_head.into_inner().elem -> Error: cannot move out of Rc, which only allows shared reference.
+            // Rc::try_unwrap(old_head).unwrap().elem; -> Error: the method `unwrap` exists but the following trait bounds were not satisfied:
+            // `Rc<RefCell<fourth::Node<T>>>: Debug`
+            Rc::try_unwrap(old_head).ok().unwrap().into_inner().elem
+        })
+    }
+}
+
+
+#[cfg(test)]
+mod test {
+    use super::List;
+
+    #[test]
+    fn basics(){
+        let mut list = List::new();
+
+        // empty list
+        assert_eq!(list.pop_front(), None);
+
+        list.push_front(1);
+        list.push_front(2);
+        list.push_front(3);
+
+
+        assert_eq!(list.pop_front(), Some(3));
+        assert_eq!(list.pop_front(), Some(2));
+
+
+        list.push_front(4);
+        list.push_front(5);
+
+        assert_eq!(list.pop_front(), Some(5));
+        assert_eq!(list.pop_front(), Some(4));
+
+        assert_eq!(list.pop_front(), Some(1));
+        assert_eq!(list.pop_front(), None);
+    }
 }
 
