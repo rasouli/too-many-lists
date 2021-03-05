@@ -154,7 +154,7 @@ impl<T> Iterator for IntoIter<T> {
     }
 }
 
-impl <T> DoubleEndedIterator for IntoIter<T> {
+impl<T> DoubleEndedIterator for IntoIter<T> {
     fn next_back(&mut self) -> Option<T> {
         self.0.pop_back()
     }
