@@ -1,5 +1,5 @@
+use std::cell::{Ref, RefCell, RefMut};
 use std::rc::Rc;
-use std::cell::{RefCell, Ref, RefMut};
 
 pub struct List<T> {
     head: Link<T>,
@@ -16,16 +16,15 @@ struct Node<T> {
 
 impl<T> Node<T> {
     fn new(elem: T) -> Rc<RefCell<Self>> {
-        Rc::new(
-            RefCell::new(Node {
-                elem: elem,
-                next: None,
-                prev: None,
-            }))
+        Rc::new(RefCell::new(Node {
+            elem: elem,
+            next: None,
+            prev: None,
+        }))
     }
 }
 
-impl <T> List<T> {
+impl<T> List<T> {
     pub fn new() -> Self {
         List {
             head: None,
@@ -77,10 +76,10 @@ impl <T> List<T> {
         })
     }
 
-    pub fn push_back(&mut self, elem:T)  {
+    pub fn push_back(&mut self, elem: T) {
         let new_tail = Node::new(elem);
 
-        match  self.tail.take() {
+        match self.tail.take() {
             Some(old_tail) => {
                 old_tail.borrow_mut().next = Some(new_tail.clone());
                 new_tail.borrow_mut().prev = Some(old_tail);
@@ -94,7 +93,8 @@ impl <T> List<T> {
 
     pub fn pop_back(&mut self) -> Option<T> {
         self.tail.take().map(|old_tail| {
-            match old_tail.borrow_mut().prev.take() { // prev.take(), next.take() -> detach before/after node from node which is about to be removed
+            match old_tail.borrow_mut().prev.take() {
+                // prev.take(), next.take() -> detach before/after node from node which is about to be removed
                 Some(new_tail) => {
                     new_tail.borrow_mut().next.take();
                     self.tail = Some(new_tail);
@@ -130,7 +130,7 @@ impl <T> List<T> {
     }
 }
 
-impl <T> Drop for List<T> {
+impl<T> Drop for List<T> {
     fn drop(&mut self) {
         while self.pop_front().is_some() {}
     }
@@ -140,13 +140,13 @@ impl <T> Drop for List<T> {
 
 pub struct IntoIter<T>(List<T>);
 
-impl <T> List<T>  {
+impl<T> List<T> {
     pub fn into_iter(self) -> IntoIter<T> {
         IntoIter(self)
     }
 }
 
-impl<T> Iterator for  IntoIter<T> {
+impl<T> Iterator for IntoIter<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -154,41 +154,18 @@ impl<T> Iterator for  IntoIter<T> {
     }
 }
 
-// double ended iterator
 impl <T> DoubleEndedIterator for IntoIter<T> {
     fn next_back(&mut self) -> Option<T> {
         self.0.pop_back()
     }
 }
 
-
-// Iter stuff
-pub struct Iter<'a, T> (Option<Ref<'a, Node<T>>>);
-
-impl<T> List<T> {
-    pub fn iter(&self) -> Iter<T> {
-        Iter(self.head.as_ref().map(|n| RefCell::borrow(n)))
-    }
-}
-
-impl <'a, T> Iterator for Iter<'a, T> {
-    type Item = Ref<'a, T>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.0.take().map(|node_ref| {
-            self.0  = node_ref.next.as_ref().map(|head| head.borrow());
-            Ref::map(node_ref, |node| &node.elem)
-        })
-    }
-}
-
-
 #[cfg(test)]
 mod test {
     use super::List;
 
     #[test]
-    fn basics(){
+    fn basics() {
         let mut list = List::new();
 
         // empty list
@@ -198,10 +175,8 @@ mod test {
         list.push_front(2);
         list.push_front(3);
 
-
         assert_eq!(list.pop_front(), Some(3));
         assert_eq!(list.pop_front(), Some(2));
-
 
         list.push_front(4);
         list.push_front(5);
@@ -219,7 +194,6 @@ mod test {
         list.push_back(2);
         list.push_back(3);
 
-
         assert_eq!(list.pop_back(), Some(3));
         assert_eq!(list.pop_back(), Some(2));
 
@@ -232,7 +206,6 @@ mod test {
         assert_eq!(list.pop_back(), Some(1));
         assert_eq!(list.pop_back(), None);
     }
-
 
     #[test]
     fn peek() {
@@ -250,11 +223,10 @@ mod test {
         assert_eq!(&mut *list.peek_front_mut().unwrap(), &mut 3);
         assert_eq!(&*list.peek_back().unwrap(), &1);
         assert_eq!(&mut *list.peek_back_mut().unwrap(), &mut 1);
-
     }
 
     #[test]
-    fn into_iter(){
+    fn into_iter() {
         let mut list = List::new();
         list.push_front(1);
         list.push_front(2);
@@ -266,8 +238,5 @@ mod test {
         assert_eq!(iter.next(), Some(2));
         assert_eq!(iter.next_back(), None);
         assert_eq!(iter.next(), None);
-
     }
-
 }
-

@@ -29,7 +29,6 @@ impl List {
     }
 
     pub fn pop(&mut self) -> Option<i32> {
-
         // let old_head = mem::replace(&mut self.head, Link::Empty);
         // match old_head {
         match mem::replace(&mut self.head, Link::Empty) {
@@ -68,7 +67,6 @@ mod test {
         list.push(2);
         list.push(3);
 
-
         assert_eq!(list.pop(), Some(3));
         assert_eq!(list.pop(), Some(2));
 
@@ -80,6 +78,5 @@ mod test {
 
         assert_eq!(list.pop(), Some(1));
         assert_eq!(list.pop(), None);
-
     }
 }

@@ -11,11 +11,9 @@ struct Node<T> {
     next: Link<T>,
 }
 
-impl <T> List<T> {
+impl<T> List<T> {
     fn new() -> Self {
-        List{
-            head: None,
-        }
+        List { head: None }
     }
 
     pub fn append(&self, elem: T) -> List<T> {
@@ -23,17 +21,14 @@ impl <T> List<T> {
             head: Some(Rc::new(Node {
                 elem,
                 next: self.head.clone(),
-            }))
+            })),
         }
     }
 
     pub fn tail(&self) -> List<T> {
-
         List {
             // flat map !
-            head: self.head.as_ref().and_then(|node| {
-                node.next.clone()
-            })
+            head: self.head.as_ref().and_then(|node| node.next.clone()),
         }
     }
 
@@ -46,32 +41,30 @@ pub struct Iter<'a, T> {
     next: Option<&'a Node<T>>,
 }
 
-impl <T> List<T> {
+impl<T> List<T> {
     pub fn iter(&self) -> Iter<'_, T> {
         Iter {
             // next: self.head.as_ref().map(|node: &Rc<Node<T>>| {
             //    let a: &Node<T>  = node.deref();
             //     a
             // })
-
             next: self.head.as_deref(),
         }
     }
 }
 
-impl <'a, T> Iterator for Iter<'a, T> {
-
+impl<'a, T> Iterator for Iter<'a, T> {
     type Item = &'a T;
 
-    fn next(& mut self) -> Option<Self::Item> {
-        self.next.map (|node| {
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.map(|node| {
             self.next = node.next.as_deref();
             &node.elem
         })
     }
 }
 
-impl <T> Drop for List<T> {
+impl<T> Drop for List<T> {
     fn drop(&mut self) {
         let mut head = self.head.take();
         while let Some(node) = head {
@@ -89,7 +82,7 @@ mod test {
     use super::List;
 
     #[test]
-    fn basics(){
+    fn basics() {
         let list = List::new();
         assert_eq!(list.head(), None);
 
@@ -110,7 +103,7 @@ mod test {
     }
 
     #[test]
-    fn iter(){
+    fn iter() {
         let list = List::new().append(1).append(2).append(3);
 
         let mut iter = list.iter();
